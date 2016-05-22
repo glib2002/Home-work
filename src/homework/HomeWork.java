@@ -9,9 +9,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -23,9 +26,6 @@ import java.util.logging.Logger;
  */
 public class HomeWork implements UrlOperation, GetUserOperation, PrintExodus {
 
-    /**
-     * @param args the command line arguments
-     */
     public String userInput = null;
     public Scanner scanner;
     public URL playlistUrl;
@@ -34,12 +34,13 @@ public class HomeWork implements UrlOperation, GetUserOperation, PrintExodus {
     public String nameFile;
 
     public void start() {
+        new File("Downloads").mkdir();
+        
         getUserInput();
         urlOperation();
-        dounloadFile();
+        downloadFile();
         controlFile();
         printExodus();
-
     }
 
     @Override
@@ -58,7 +59,7 @@ public class HomeWork implements UrlOperation, GetUserOperation, PrintExodus {
         while (true) {
             System.out.print("enter url here(example http://www.ex.ua/playlist/148363.m3u\"):");
             userInput = scanner.nextLine();
-            if (userInput == null) {
+            if (userInput.isEmpty()) {
                 System.err.print("please reenter!!!");
                 userInput = scanner.nextLine();
             }
@@ -73,31 +74,28 @@ public class HomeWork implements UrlOperation, GetUserOperation, PrintExodus {
     }
 
     @Override
-    public void dounloadFile() {
-        try {
+    public void downloadFile() {
+        System.out.println("please enter name of file!!!");
+        nameFile = scanner.nextLine();
 
-            try {
-                playlistUrl.openStream();
-            } catch (IOException ex) {
-                Logger.getLogger(HomeWork.class.getName()).log(Level.SEVERE, null, ex);
+        try (InputStream openStream = playlistUrl.openStream()) {
+            File file1 = new File("Downloads", nameFile + ".mp3");
 
+            if (file1.exists()) {
+                // TODO: Do if file exists.
             }
-            System.out.println("please enter nama of file!!!");
-            nameFile = scanner.nextLine();
-            fos = new FileOutputStream("c:\\Users\\Глеб\\Documents\\NetBeansProjects\\HomeWork\\src\\Dounloads\\" + nameFile + ".txt");
-            byte[] b = userInput.getBytes();
-            try {
-                fos.write(b);
-            } catch (IOException ex) {
-                Logger.getLogger(HomeWork.class.getName()).log(Level.SEVERE, null, ex);
-            }
+
+            Files.copy(openStream, file1.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (FileNotFoundException ex) {
+            Logger.getLogger(HomeWork.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(HomeWork.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private void controlFile() {
         file = new File(userInput);
+        
         if (file.exists()) {
             System.err.println("Please reenter name of file");
             nameFile = scanner.nextLine();

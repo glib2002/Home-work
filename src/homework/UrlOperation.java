@@ -11,5 +11,5 @@ package homework;
  */
 public interface UrlOperation {
     public void urlOperation();
-    public void  dounloadFile();
+    public void  downloadFile();
 }
